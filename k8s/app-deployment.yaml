@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: namegen:local            # local dev image; I need to change to ECR for EKS later
+          image: 589535614637.dkr.ecr.eu-central-1.amazonaws.com/namegen:latest
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
