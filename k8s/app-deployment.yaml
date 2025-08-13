@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: namegen-app
+  namespace: namegen
+  labels:
+    app: namegen-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: namegen-app
+  template:
+    metadata:
+      labels:
+        app: namegen-app
+    spec:
+      containers:
+        - name: app
+          image: namegen:local            # local dev image; I need to change to ECR for EKS later
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          # Read envs securely from the Secret that was created: app-env
+          envFrom:
+            - secretRef:
+                name: app-env
+          readinessProbe:
+            httpGet:
+              path: /api/connection
+              port: http
+            initialDelaySeconds: 25
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /api/connection
+              port: http
+            initialDelaySeconds: 70
+            periodSeconds: 20
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
